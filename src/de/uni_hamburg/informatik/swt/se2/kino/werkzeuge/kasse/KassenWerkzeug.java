@@ -7,6 +7,8 @@ import de.uni_hamburg.informatik.swt.se2.kino.fachwerte.Datum;
 import de.uni_hamburg.informatik.swt.se2.kino.materialien.Kino;
 import de.uni_hamburg.informatik.swt.se2.kino.materialien.Tagesplan;
 import de.uni_hamburg.informatik.swt.se2.kino.materialien.Vorstellung;
+import de.uni_hamburg.informatik.swt.se2.kino.werkzeuge.Observable;
+import de.uni_hamburg.informatik.swt.se2.kino.werkzeuge.Observer;
 import de.uni_hamburg.informatik.swt.se2.kino.werkzeuge.datumsauswaehler.DatumAuswaehlWerkzeug;
 import de.uni_hamburg.informatik.swt.se2.kino.werkzeuge.platzverkauf.PlatzVerkaufsWerkzeug;
 import de.uni_hamburg.informatik.swt.se2.kino.werkzeuge.vorstellungsauswaehler.VorstellungsAuswaehlWerkzeug;
@@ -19,7 +21,7 @@ import de.uni_hamburg.informatik.swt.se2.kino.werkzeuge.vorstellungsauswaehler.V
  * @author SE2-Team
  * @version SoSe 2015
  */
-public class KassenWerkzeug
+public class KassenWerkzeug implements Observer
 {
     // Das Material dieses Werkzeugs
     private Kino _kino;
@@ -49,6 +51,10 @@ public class KassenWerkzeug
         _platzVerkaufsWerkzeug = new PlatzVerkaufsWerkzeug();
         _datumAuswaehlWerkzeug = new DatumAuswaehlWerkzeug();
         _vorstellungAuswaehlWerkzeug = new VorstellungsAuswaehlWerkzeug();
+        
+        _platzVerkaufsWerkzeug.addObserver(this);
+        _datumAuswaehlWerkzeug.addObserver(this);
+        _vorstellungAuswaehlWerkzeug.addObserver(this);
 
         // UI erstellen (mit eingebetteten UIs der direkten Subwerkzeuge)
         _ui = new KassenWerkzeugUI(_platzVerkaufsWerkzeug.getUIPanel(),
@@ -119,4 +125,22 @@ public class KassenWerkzeug
     {
         return _vorstellungAuswaehlWerkzeug.getAusgewaehlteVorstellung();
     }
+
+	/**
+	 * Wird aufgerufen wenn im UI eine Änderung passiert ist 
+	 * und aktualisiert die Ansicht entsprechend.
+	 */
+    @Override
+	public void reagiereaufAenderungen(Observable sender) {
+		if (sender instanceof DatumAuswaehlWerkzeug) {
+			setzeTagesplanFuerAusgewaehltesDatum();
+		}
+		else if (sender instanceof PlatzVerkaufsWerkzeug) {
+			
+		}
+		else if (sender instanceof VorstellungsAuswaehlWerkzeug) {
+			setzeAusgewaehlteVorstellung();
+		}
+		
+	}
 }
